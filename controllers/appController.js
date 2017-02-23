@@ -27,11 +27,26 @@ const cocoAction = {
       }
       if(item === '-s' || item === '--save'){
         splitArgs.toFile = true;
-        if(!cocoLib.isDir(userArgs[n+1])){
-          return showError(undefined, "directory");
-        } 
+        //TODO: Check if we are overwriting a file, and if dir exists.
+        //Several states.
+        //Directory exists, file does not.
+        //Directory and file exists
+        //Directory does not exist
         n++;
         splitArgs.saveDir = userArgs[n];
+
+        if(cocoLib.isDir(splitArgs.saveDir)){
+          //will overrite
+          console.log("Will overwrite " + splitArgs.saveDir);
+        }
+        else{
+          //Make new file?
+          console.log("need to craete new file");
+          //return showError(dir, "path");
+        }
+        // if(!cocoLib.isDir(splitArgs.saveDir)){
+
+        // } 
         continue;
       }
       // if(item === '-r' || item === '--read'){
@@ -51,19 +66,19 @@ const cocoAction = {
       //If it's not a switch, it's a normal argument
       splitArgs.userArgs.push(item);
     }
-
-    //Store the user specified action 
-    splitArgs.userAction = splitArgs.userArgs[0];
-    splitArgs.userCodec = splitArgs.userArgs[1];
+    
+    //Store the user specified action. We only care about lowercasing things that aren't input.
+    splitArgs.userAction = splitArgs.userArgs[0] ? splitArgs.userArgs[0].toLowerCase() : '';
+    splitArgs.userCodec = splitArgs.userArgs[1] ? splitArgs.userArgs[1].toLowerCase() : '';
     splitArgs.userInput = splitArgs.userArgs[2];
-    splitArgs.userOption = splitArgs.userArgs[3];
+    splitArgs.userOption = splitArgs.userArgs[3] ? splitArgs.userArgs[3].toLowerCase() : '';
 
     if(!splitArgs.userAction || splitArgs.userAction === 'help'){
       return help.help();
     }
     //If action isn't mapped to a supported value, show error.
     if(!actionMap[splitArgs.userAction]){
-      return showError(splitArgs.userAction, "action");
+      return showError(splitArgs.userAction, "<action>");
     }
     //If help is requested, and codec and input are undefined, display action help.
     if(splitArgs.isHelp && splitArgs.userCodec === undefined && splitArgs.userInput === undefined){
@@ -78,7 +93,7 @@ const cocoAction = {
   codecCommon: (splitArgs) => {
     //If codec is unsupported, show error.
     if(codecController.format[splitArgs.userCodec] === undefined){
-      return showError(splitArgs.userCodec, 'codec');
+      return showError(splitArgs.userCodec, '<codec>');
     }
     //If there is no input...
     if(splitArgs.userInput === undefined){
@@ -86,7 +101,7 @@ const cocoAction = {
         return help.codecHelp[splitArgs.userCodec]();
       }
       else{
-        return showError(splitArgs.userInput, 'input');
+        return showError(splitArgs.userInput, '<input>');
       }
     }
     //Check to see if input argument is a file
@@ -96,13 +111,23 @@ const cocoAction = {
     }
 
     //Run handler for actual action.
-    cocoAction[splitArgs.userAction](splitArgs);
+    let payload = cocoAction[splitArgs.userAction](splitArgs);
+    if(payload.color){
+      console.log(payload.color);
+    }
+    else{
+      console.log(payload.payload);
+    }
+    //If we needed to save, now's the time to do it.
+    if(splitArgs.saveDir){
+      cocoLib.createFile(splitArgs.saveDir, payload.payload);
+    }
   },
   encode: (splitArgs) => {
-    codecController.format[splitArgs.userCodec](true, splitArgs);
+    return codecController.format[splitArgs.userCodec](true, splitArgs);
   },
   decode: (splitArgs) => {
-    codecController.format[splitArgs.userCodec](false, splitArgs);
+    return codecController.format[splitArgs.userCodec](false, splitArgs);
   }
 };
 
@@ -112,13 +137,25 @@ const showError = function(input, name){
 
   }
   else{
-    console.log(chalk.red('\'%s\' is not a recognized coco %s. See \'coco help\'.'), input, name);
+    console.log(chalk.red('\'%s\' is not recognized. Please provide a valid %s. See \'coco help\'.'), input, name);
   }
+};
+
+const debug = function(){
+  const trucolor = require('trucolor');
+  const chalkishPalette = trucolor.chalkish(trucolor.palette({}, {
+    red: "red"
+  }));
+  console.log(chalkishPalette.red('txt'));
+  console.log('h');
 };
 
 const actionMap = {
   "encode": cocoAction.codecCommon,
   "decode": cocoAction.codecCommon,
+  "debug": debug
 };
+
+
 
 module.exports = cocoAction;
