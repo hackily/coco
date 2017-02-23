@@ -1,31 +1,19 @@
 #! /usr/bin/env node
 const main = require('./controllers/appController');
-let chalk = require('chalk');
-const cocoLib = require('./lib/lib');
 
 //Grab user provided arguments
 const userArgs = process.argv.slice(2);
-
+//Convert string input to lowercase
 const lowerArgs = userArgs.map((item) => {
   return item.toLowerCase();
 });
 
-console.log('User Args are: ' + lowerArgs); //TODO: Remove log after dev.
-
-const actionObj = {
-  "encode": "encode",
-  "decode": "decode",
-  "foo": main.help,
-  "help": main.help,
-  "-h": main.help
-};
-const action = userArgs[0];
-//If action is supported, do action. Else, show help.
-if(actionObj[action]){
-  actionObj[action]();
+if(process.env.NODE_ENV === 'development'){
+  console.log('User Args are: ' + lowerArgs); //TODO: Remove log after dev.
 }
 
-//cmd[userArgs[0]];
+main.handleInput(userArgs);
+
 
 /**
  * App requirements

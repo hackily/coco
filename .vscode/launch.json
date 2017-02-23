@@ -8,12 +8,54 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Encode",
+      "name": "Encode",
       "program": "${workspaceRoot}/index.js",
       "cwd": "${workspaceRoot}",
       "args": [ 
         "encode"
-      ]
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Encode jwt",
+      "program": "${workspaceRoot}/index.js",
+      "cwd": "${workspaceRoot}",
+      "args": [ 
+        "encode", "jwt"
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Encode jwt path",
+      "program": "${workspaceRoot}/index.js",
+      "cwd": "${workspaceRoot}",
+      "args": [ 
+        "encode", "jwt", "./file.js"
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Encode base64 asdf",
+      "program": "${workspaceRoot}/index.js",
+      "cwd": "${workspaceRoot}",
+      "args": [ 
+        "encode", "base64", "asdf"
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      }
     },
     {
       "type": "node",
@@ -23,7 +65,29 @@
       "cwd": "${workspaceRoot}",
       "args": [ 
         "break"
-      ]
-    }
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha Tests",
+      "cwd": "${workspaceRoot}",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/mocha",
+      "windows": {
+        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/mocha.cmd"
+      },
+      "runtimeArgs": [
+        "-u",
+        "tdd",
+        "--timeout",
+        "999999",
+        "--colors",
+        "${workspaceRoot}/test"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
+    },
   ]
 }

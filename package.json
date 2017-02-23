@@ -1,7 +1,7 @@
 {
   "name": "common-codec-cli",
   "version": "1.0.0",
-  "description": "CLI to encode/decode common formats such as JWT, Base64, Hex Edit",
+  "description": "CLI to encode/decode common formats such as JWT, Base64, Hex, ASCII, Binary",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,7 +15,10 @@
     "decode",
     "jwt",
     "base64",
-    "hex"
+    "hex",
+    "cli",
+    "binary",
+    "ascii"
   ],
   "author": "Neil Wang",
   "license": "MIT",
@@ -29,10 +32,10 @@
   "homepage": "https://github.com/unkani/common-codec-cli#readme",
   "devDependencies": {
     "chai": "^3.5.0",
-    "jshint": "^2.9.4",
     "mocha": "^3.2.0"
   },
   "dependencies": {
-    "chalk": "^1.1.3"
+    "chalk": "^1.1.3",
+    "jsonwebtoken": "^7.3.0"
   }
 }
