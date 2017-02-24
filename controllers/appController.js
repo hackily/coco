@@ -41,7 +41,7 @@ const cocoAction = {
         }
         else{
           //Make new file?
-          console.log("need to craete new file");
+          console.log("need to create new file");
           //return showError(dir, "path");
         }
         // if(!cocoLib.isDir(splitArgs.saveDir)){

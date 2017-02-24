@@ -7,18 +7,57 @@ var base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456
 
 let AsciiToBin={toAscii:function(a){return a.replace(/\s*[01]{8}\s*/g,function(a){return String.fromCharCode(parseInt(a,2))})},toBinary:function(a,b){return a.replace(/[\s\S]/g,function(a){a=AsciiToBin.zeroPad(a.charCodeAt().toString(2));return!1==b?a:a+" "})},zeroPad:function(a){return"00000000".slice(String(a).length)+a}};
 
-const hexToRGB = function(hex){
-	hex = hex.replace('#', '');
-	const hexify = trucolor.chalkish(trucolor.palette({}, {
-		color: 'background ' + hex
-	}))
-	let red = parseInt(hex.substring(0, 2*hex.length/3), 16).toString();
-	let green = parseInt(hex.substring(hex.length/3, 2*hex.length/3), 16).toString();
-	let blue = parseInt(hex.substring(2*hex.length/3, hex.length), 16).toString();
+const hexRGBCodec = function(isEncode, input){
+	let hex = input.replace('#', '');
+	let payload = '';
+	if(!isEncode){
+		if(!(hex.length === 3 || hex.length === 6)){
+			return showError("hex input", "input");
+		}
+		const hexify = trucolor.chalkish(trucolor.palette({}, {
+			color: 'background ' + hex,
+			text: hex
+		}))
+		var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+		hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+			return r + r + g + g + b + b;
+		});
+		var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+		result = result.map((item) => {
+			return parseInt(item, 16);
+		})
+		console.log(hexify.color('                    '));
+		payload = {
+			"payload": result.join(' '),
+			"color": chalk.red(result[1]) + ' ' + chalk.green(result[2]) + ' ' + chalk.blue(result[3])
+		}
+	}
+	else{
+		const rgb = input.split(' ');
+		const hex = "#" + rgb.map((item) => {return parseInt(item).toString(16)}).join('');
+		const hexify = trucolor.chalkish(trucolor.palette({}, {
+			color: 'background ' + hex,
+			text: hex
+		}))
+		payload = {
+			"payload": hex,
+			"color": hexify.text(hex)
+		}
 
-	console.log(hexify.color('    '));
-	return chalk.red(red) + ' ' + chalk.green(green) + ' ' + chalk.blue(blue);
+	}
+
+
+
+
+	return payload
 	//TODO: See if this outputs color correctly in a 24-bit console
+}
+const hexDecCodec = function(isEncode, hex){
+	hex = hex.replace('#', '');
+	console.log("Hexadecimal to decimal");
+	const payload = isEncode ? parseInt(hex).toString(16).toUpperCase() : parseInt(hex, 16);
+	const output = { "payload" : payload };
+	return output;
 }
 
 const showError = function(input, name){
@@ -37,7 +76,7 @@ const translateJwt = function(isEncode, splitArgs){
 		secret = splitArgs.userOption;
 	}
 	else if(isEncode){
-		console.log(chalk.yellow('No secret provided. Be aware that the generated jwt will not work\n'));
+		console.log(chalk.yellow('No secret provided. Be aware that the generated jwt will not work'));
 	}
 	let payload = isEncode ? jwt.sign(splitArgs.userInput, secret) : JSON.stringify(jwt.decode(splitArgs.userInput), null, 2);
 	if(payload === null) payload = "Invalid JWT";
@@ -45,41 +84,43 @@ const translateJwt = function(isEncode, splitArgs){
 	//colorize
 	payload = {"payload": payload, "color": ''};
 	if(isEncode){
-		let colorPayload = payload.split('.');
+		let colorPayload = payload.payload.split('.');
 		payload.color = chalk.red(colorPayload[0]) + '.' + chalk.magenta(colorPayload[1]) + '.' + chalk.blue(colorPayload[2]);
 	}
 	return payload;
 
 }
 const translateBase64 = function(isEncode, splitArgs){
-	const payload = isEncode ? base64.encode(splitArgs.userInput) : base64.decode(splitArgs.userInput);
-	payload = {"payload" : payload}
-	return payload;
+	let payload = isEncode ? base64.encode(splitArgs.userInput) : base64.decode(splitArgs.userInput);
+	const output = {"payload" : payload, "color" : chalk.green(payload)}
+	return output;
 }
 const translateHex = function(isEncode, splitArgs){
 	let payload = '';
 	const fn = {
-		"rgb": hexToRGB
+		"rgb": hexRGBCodec,
+		"hex": hexDecCodec,
+		"dec": hexDecCodec,
+		"decimal": hexDecCodec,
+		"hexadecimal": hexDecCodec
 	}
+	//Default case, 
 	if(!fn[splitArgs.userOption]){
-		let input = splitArgs.userInput.replace('#', '');
-		console.log("Hexadecimal to decimal");
-		payload = isEncode ? parseInt(input).toString(16).toUpperCase() : parseInt(input, 16);
+		payload = hexDecCodec(isEncode, splitArgs.userInput);
 	}
 	else{
-		payload = fn[splitArgs.userOption](splitArgs.userInput);
+		payload = fn[splitArgs.userOption](isEncode, splitArgs.userInput);
 	}
-	if(payload === "NAN"){
+	if(payload.payload === "NAN"){
 		return showError(splitArgs.userInput, '<input>')
 	}
-	payload = {"payload" : payload}
 	return payload;
 }
 const translateUri = function(isEncode, splitArgs){
 	const payload = isEncode ? encodeURIComponent(splitArgs.userInput) : decodeURIComponent(splitArgs.userInput);
-	payload = {"payload" : payload}
+	const output = {"payload" : payload}
 
-	return payload;
+	return output;
 }
 const translateBinary = function(isEncode, splitArgs){
 	if(isEncode && !/^\d+$/.test(splitArgs.userInput) || (!isEncode && /[^0-1]/g.test(decode.value))){
@@ -87,8 +128,8 @@ const translateBinary = function(isEncode, splitArgs){
 		return;
 	}
 	const payload = isEncode ? (parseInt(splitArgs.userInput) >>> 0).toString(2) : parseInt(splitArgs.userInput, 2);
-	payload = {"payload" : payload}
-	return payload;
+	const output = {"payload" : payload}
+	return output;
 }
 
 const translateAscii = function(isEncode, splitArgs){
@@ -104,8 +145,8 @@ const translateAscii = function(isEncode, splitArgs){
 		splitArgs.userInput.split(' ').forEach(x=> payload += String.fromCharCode(x));
 	}
 
-	payload = {"payload" : payload}
-	return payload;
+	const output = {"payload" : payload}
+	return output;
 }
 
 

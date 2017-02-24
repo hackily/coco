@@ -12,7 +12,14 @@ if(process.env.NODE_ENV === 'development'){
   console.log('User Args are: ' + lowerArgs); //TODO: Remove log after dev.
 }
 
-main.handleInput(userArgs);
+try{
+  main.handleInput(userArgs);
+} catch(e){
+  if(process.env.NODE_ENV === 'development'){
+    console.log(e);
+  }
+}
+
 
 
 /**
