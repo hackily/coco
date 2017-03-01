@@ -1,6 +1,7 @@
 const chalk = require('chalk');
 const cocoLib = require('../lib/lib');
 const codecController = require('./codecController');
+const colorMe = require('./colorController');
 const help = require('./helpController');
 let userInputIsFile = false;
 
@@ -13,6 +14,7 @@ const cocoAction = {
       userCodec: '',
       userInput: '',
       userOption: '',
+      isEncode: false,
       isHelp: false,
       toFile: false,
       saveDir: '',
@@ -61,7 +63,8 @@ const cocoAction = {
       // }
       //Store all switches
       if(item.charAt(0) === '-'){
-        return splitArgs.switches.push(item);
+        splitArgs.switches.push(item);
+        continue;
       }
       //If it's not a switch, it's a normal argument
       splitArgs.userArgs.push(item);
@@ -70,6 +73,7 @@ const cocoAction = {
     //Store the user specified action. We only care about lowercasing things that aren't input.
     splitArgs.userAction = splitArgs.userArgs[0] ? splitArgs.userArgs[0].toLowerCase() : '';
     splitArgs.userCodec = splitArgs.userArgs[1] ? splitArgs.userArgs[1].toLowerCase() : '';
+    splitArgs.isEncode = splitArgs.userAction === 'encode' ? true : false;
     splitArgs.userInput = splitArgs.userArgs[2];
     splitArgs.userOption = splitArgs.userArgs[3] ? splitArgs.userArgs[3].toLowerCase() : '';
 
@@ -112,28 +116,34 @@ const cocoAction = {
 
     //Run handler for actual action.
     let payload = cocoAction[splitArgs.userAction](splitArgs);
-    if(payload.color){
-      console.log(payload.color);
-    }
-    else{
-      console.log(payload.payload);
-    }
+
+
     //If we needed to save, now's the time to do it.
     if(splitArgs.saveDir){
       cocoLib.createFile(splitArgs.saveDir, payload.payload);
     }
+    //We can return console output there
+    //By default, we color the input.
+    const colored = colorMe[splitArgs.userCodec](splitArgs, payload);
+    if(colored){
+      console.log(colored);
+    }
+    else{
+      console.log(payload);
+    }
   },
   encode: (splitArgs) => {
-    return codecController.format[splitArgs.userCodec](true, splitArgs);
+    return codecController.format[splitArgs.userCodec](splitArgs.isEncode, splitArgs);
   },
   decode: (splitArgs) => {
-    return codecController.format[splitArgs.userCodec](false, splitArgs);
+    return codecController.format[splitArgs.userCodec](splitArgs.isEncode, splitArgs);
   }
 };
 
 const showError = function(input, name){
   if(input === undefined){
-    console.log(chalk.red('<%s> must be provided. See \'coco help\'.'), name);
+    throw "new error";
+    console.log(chalk.red('%s must be provided. See \'coco help\'.'), name);
 
   }
   else{

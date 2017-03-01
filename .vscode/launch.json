@@ -8,11 +8,37 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Encode",
+      "name": "Encode jwt",
       "program": "${workspaceRoot}/index.js",
       "cwd": "${workspaceRoot}",
       "args": [ 
-        "encode", "hex", "255 255 0", "rgb"
+        "encode", "jwt", "foo"
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Encode jwt secret",
+      "program": "${workspaceRoot}/index.js",
+      "cwd": "${workspaceRoot}",
+      "args": [ 
+        "encode", "jwt", "foo", "secret", "-help"
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "encode hex rgb",
+      "program": "${workspaceRoot}/index.js",
+      "cwd": "${workspaceRoot}",
+      "args": [ 
+        "encode", "hex", "255 255 100", "rgb"
       ],
       "env": {
         "NODE_ENV": "development"
@@ -87,7 +113,10 @@
         "--colors",
         "${workspaceRoot}/test"
       ],
-      "internalConsoleOptions": "openOnSessionStart"
-    },
+      "internalConsoleOptions": "openOnSessionStart",
+      "env": {
+        "NODE_ENV": "test"
+      }
+    }
   ]
 }

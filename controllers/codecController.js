@@ -14,86 +14,46 @@ const hexRGBCodec = function(isEncode, input){
 		if(!(hex.length === 3 || hex.length === 6)){
 			return showError("hex input", "input");
 		}
-		const hexify = trucolor.chalkish(trucolor.palette({}, {
-			color: 'background ' + hex,
-			text: hex
-		}))
 		var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
 		hex = hex.replace(shorthandRegex, function(m, r, g, b) {
 			return r + r + g + g + b + b;
 		});
 		var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-		result = result.map((item) => {
+		const rgb = result.slice(1).map((item) => {
 			return parseInt(item, 16);
 		})
-		console.log(hexify.color('                    '));
-		payload = {
-			"payload": result.join(' '),
-			"color": chalk.red(result[1]) + ' ' + chalk.green(result[2]) + ' ' + chalk.blue(result[3])
-		}
+
+		payload = rgb.join(' ');
 	}
 	else{
 		const rgb = input.split(' ');
-		const hex = "#" + rgb.map((item) => {return parseInt(item).toString(16)}).join('');
-		const hexify = trucolor.chalkish(trucolor.palette({}, {
-			color: 'background ' + hex,
-			text: hex
-		}))
-		payload = {
-			"payload": hex,
-			"color": hexify.text(hex)
-		}
-
+		const hex = "#" + rgb.map((item) => {return parseInt(item).toString(16).toUpperCase()}).join('');
+		payload = hex;
 	}
-
-
-
-
-	return payload
-	//TODO: See if this outputs color correctly in a 24-bit console
+	return payload;
 }
 const hexDecCodec = function(isEncode, hex){
 	hex = hex.replace('#', '');
-	console.log("Hexadecimal to decimal");
 	const payload = isEncode ? parseInt(hex).toString(16).toUpperCase() : parseInt(hex, 16);
-	const output = { "payload" : payload };
-	return output;
+	return payload;
 }
 
-const showError = function(input, name){
-  if(input === undefined){
-    console.log(chalk.red('<%s> must be provided. See \'coco help\'.'), name);
-
-  }
-  else{
-    console.log(chalk.red('\'%s\' is not recognized. Please provide a valid <%s>. See \'coco help\'.'), input, name);
-  }
-};
-
 const translateJwt = function(isEncode, splitArgs){
+	//Use this secret if none is provided
 	let secret = 'shh';
 	if(splitArgs.userOption){
 		secret = splitArgs.userOption;
 	}
-	else if(isEncode){
+	else if(!process.env.NODE_ENV && isEncode){
 		console.log(chalk.yellow('No secret provided. Be aware that the generated jwt will not work'));
 	}
 	let payload = isEncode ? jwt.sign(splitArgs.userInput, secret) : JSON.stringify(jwt.decode(splitArgs.userInput), null, 2);
 	if(payload === null) payload = "Invalid JWT";
-
-	//colorize
-	payload = {"payload": payload, "color": ''};
-	if(isEncode){
-		let colorPayload = payload.payload.split('.');
-		payload.color = chalk.red(colorPayload[0]) + '.' + chalk.magenta(colorPayload[1]) + '.' + chalk.blue(colorPayload[2]);
-	}
 	return payload;
-
 }
 const translateBase64 = function(isEncode, splitArgs){
 	let payload = isEncode ? base64.encode(splitArgs.userInput) : base64.decode(splitArgs.userInput);
-	const output = {"payload" : payload, "color" : chalk.green(payload)}
-	return output;
+	return payload;
 }
 const translateHex = function(isEncode, splitArgs){
 	let payload = '';
@@ -109,27 +69,25 @@ const translateHex = function(isEncode, splitArgs){
 		payload = hexDecCodec(isEncode, splitArgs.userInput);
 	}
 	else{
+		//Do different action depending on option, mapped above.
 		payload = fn[splitArgs.userOption](isEncode, splitArgs.userInput);
 	}
-	if(payload.payload === "NAN"){
-		return showError(splitArgs.userInput, '<input>')
+
+	if(payload === "NAN"){
+		throw new Error("Dec to Hex input was NaN");
 	}
 	return payload;
 }
 const translateUri = function(isEncode, splitArgs){
-	const payload = isEncode ? encodeURIComponent(splitArgs.userInput) : decodeURIComponent(splitArgs.userInput);
-	const output = {"payload" : payload}
-
-	return output;
+	const payload = isEncode ? encodeURI(splitArgs.userInput) : decodeURI(splitArgs.userInput);
+	return payload;
 }
 const translateBinary = function(isEncode, splitArgs){
 	if(isEncode && !/^\d+$/.test(splitArgs.userInput) || (!isEncode && /[^0-1]/g.test(decode.value))){
-		console.log('Invalid splitArgs.userInput');
-		return;
+		throw new 'Invalid Input';
 	}
 	const payload = isEncode ? (parseInt(splitArgs.userInput) >>> 0).toString(2) : parseInt(splitArgs.userInput, 2);
-	const output = {"payload" : payload}
-	return output;
+	return payload;
 }
 
 const translateAscii = function(isEncode, splitArgs){
@@ -145,8 +103,7 @@ const translateAscii = function(isEncode, splitArgs){
 		splitArgs.userInput.split(' ').forEach(x=> payload += String.fromCharCode(x));
 	}
 
-	const output = {"payload" : payload}
-	return output;
+	return payload;
 }
 
 

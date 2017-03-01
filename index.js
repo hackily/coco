@@ -18,6 +18,7 @@ try{
   if(process.env.NODE_ENV === 'development'){
     console.log(e);
   }
+  console.log(e);
 }
 
 
