@@ -83,7 +83,7 @@ const translateUri = function(isEncode, splitArgs){
 	return payload;
 }
 const translateBinary = function(isEncode, splitArgs){
-	if(isEncode && !/^\d+$/.test(splitArgs.userInput) || (!isEncode && /[^0-1]/g.test(decode.value))){
+	if(isEncode && !/^\d+$/.test(splitArgs.userInput) || (!isEncode && /[^0-1]/g.test(splitArgs.userInput))){
 		throw new 'Invalid Input';
 	}
 	const payload = isEncode ? (parseInt(splitArgs.userInput) >>> 0).toString(2) : parseInt(splitArgs.userInput, 2);

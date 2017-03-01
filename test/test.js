@@ -150,13 +150,90 @@ describe('Codecs', () => {
 			const payload = '170 187 204';
 			const colored = colorMe.hex(splitArgs, payload);
 			console.log('        ' + colored);
-			colored.should.equal('');
+			colored.should.equal('\u001b[31m170\u001b[39m \u001b[32m187\u001b[39m \u001b[34m204\u001b[39m');
 			done();
 		});
+	});
+	describe('uri', () =>{
+		let splitArgs = {};
+		beforeEach((done)=>{
+			splitArgs = {
+				userArgs: [],
+				switches: [],
+				userAction: '',
+				userCodec: '',
+				userInput: '',
+				userOption: '',
+				isEncode: false,
+				isHelp: false,
+				toFile: false,
+				saveDir: '',
+				// readDir: ''
+			};
+			done();
+		});
+		it('encodes', (done) => {
+			splitArgs.userInput = 'https://mywebsite.com/input?p=1&q="latitude!?"';
+			const payload = codec.format.uri(true, splitArgs);
+			payload.should.equal('https://mywebsite.com/input?p=1&q=%22latitude!?%22');
+			done();
+		});
+		it('decodes', (done) => {
+			splitArgs.userInput = 'https://mywebsite.com/input?p=1&q=%22latitude!?%22';
+			const payload = codec.format.uri(false, splitArgs);
+			payload.should.equal('https://mywebsite.com/input?p=1&q="latitude!?"');
+			done();
+		});
+		it('colors encode output', (done) => {
+			const payload = 'https://mywebsite.com/input?p=1&q=%22latitude!?%22';
+			splitArgs.isEncode = true;
+			const colored = colorMe.uri(splitArgs, payload);
+			console.log('        ' + colored);
+			colored.should.equal('\u001b[33mhttps://mywebsite.com/input?p=1&q=%22latitude!?%22\u001b[39m');
+			done();
+		});
+	});
+	describe('binary', () =>{
+		let splitArgs = {};
+		beforeEach((done)=>{
+			splitArgs = {
+				userArgs: [],
+				switches: [],
+				userAction: '',
+				userCodec: '',
+				userInput: '',
+				userOption: '',
+				isEncode: false,
+				isHelp: false,
+				toFile: false,
+				saveDir: '',
+				// readDir: ''
+			};
+			done();
+		});
+		it('encodes', (done) => {
+			splitArgs.userInput = '12345';
+			const payload = codec.format.binary(true, splitArgs);
+			payload.should.equal('11000000111001');
+			done();
+		});
+		it('decodes', (done) => {
+			splitArgs.userInput = '101010111101';
+			const payload = codec.format.binary(false, splitArgs);
+			payload.should.equal(2749);
+			done();
+		});
+		it('colors encode output', (done) => {
+			const payload = '1110010101010';
+			splitArgs.isEncode = true;
+			const colored = colorMe.binary(splitArgs, payload);
+			console.log('        ' + colored);
+			colored.should.equal('\u001b[33m1110010101010\u001b[39m');
+			done();
+		});
+	});
 /*
-		"uri": translateUri,	
 		"binary": translateBinary,
 		"ascii": translateAscii,
 */
-	});
 });

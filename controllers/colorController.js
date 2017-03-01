@@ -48,11 +48,15 @@ const colorHex = function(args, input){
 }
 
 const colorUri = function(args, input){
-	return input;
+	return chalk.yellow(input);
 };
 
 const colorAscii = function(args, input){
-	return input;
+	return chalk.yellow(input);
+};
+
+const colorBinary = function(args, input){
+	return chalk.yellow(input);
 }
 
 
@@ -62,6 +66,6 @@ module.exports = {
 	"base64": colorBase64,
 	"hex": colorHex,
 	"ascii": colorAscii,
-	"uri": colorUri
-
-}
+	"uri": colorUri,
+	"binary": colorBinary
+};
