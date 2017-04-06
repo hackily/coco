@@ -14,7 +14,7 @@ Action can be encode or decode
 Codec is one of jwt, base64, hex, uri, binary, or ascii
 Input is the string of text that you want to convert.
 
-> coco <action> <codec> <input> <option>
+    coco <action> <codec> <input> <option>
 
 Eg
 
