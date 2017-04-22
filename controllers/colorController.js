@@ -1,11 +1,12 @@
-const trucolor = require('trucolor');
+//const trucolor = require('trucolor');
+const chalk = require('chalk');
 
 let palette = {
 	"red" : "red",
 	"green" : "green",
 	"blue" : "blue",
 }
-let chalk = trucolor.chalkish(trucolor.simple());
+//let chalk = //trucolor.chalkish(trucolor.simple());
 
 const colorRGB = function(input){
 
@@ -40,9 +41,9 @@ const colorHex = function(args, input){
 		rgb[0] = chalk.red(rgb[0]);
 		rgb[1] = chalk.green(rgb[1]);
 		rgb[2] = chalk.blue(rgb[2]);
-		const pal = trucolor.palette({}, {"bg" : 'background ' + args.userInput});
+		//const pal = trucolor.palette({}, {"bg" : 'background ' + args.userInput});
 		//TODO: See if this works in trucolor console
-		console.log(pal.bg.in + '        ' + pal.bg.out);
+		//console.log(pal.bg.in + '        ' + pal.bg.out);
 		return rgb.join(' ');
 	}
 }

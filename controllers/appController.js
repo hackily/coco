@@ -151,19 +151,19 @@ const showError = function(input, name){
   }
 };
 
-const debug = function(){
-  const trucolor = require('trucolor');
-  const chalkishPalette = trucolor.chalkish(trucolor.palette({}, {
-    red: "red"
-  }));
-  console.log(chalkishPalette.red('txt'));
-  console.log('h');
-};
+// const debug = function(){
+//   const trucolor = require('trucolor');
+//   const chalkishPalette = trucolor.chalkish(trucolor.palette({}, {
+//     red: "red"
+//   }));
+//   console.log(chalkishPalette.red('txt'));
+//   console.log('h');
+// };
 
 const actionMap = {
   "encode": cocoAction.codecCommon,
   "decode": cocoAction.codecCommon,
-  "debug": debug
+  // "debug": debug
 };
 
 
