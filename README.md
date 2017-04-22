@@ -33,3 +33,5 @@ Eg
     
     coco decode hex 0011aa rgb
     0 17 170
+
+![coco-cli](/resources/images/coco-cli.gif)
