@@ -7,7 +7,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/unkani/common-codec-cli.git"
+    "url": "git+https://github.com/hackily/common-codec-cli.git"
   },
   "keywords": [
     "codec",
@@ -27,9 +27,9 @@
     "coco": "index.js"
   },
   "bugs": {
-    "url": "https://github.com/unkani/common-codec-cli/issues"
+    "url": "https://github.com/hackily/common-codec-cli/issues"
   },
-  "homepage": "https://github.com/unkani/common-codec-cli#readme",
+  "homepage": "https://github.com/hackily/common-codec-cli#readme",
   "devDependencies": {
     "chai": "^3.5.0",
     "mocha": "^3.2.0"
